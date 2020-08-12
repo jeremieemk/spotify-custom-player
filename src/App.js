@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import queryString from "query-string";
 import styled from "styled-components";
-
-import AlbumsList from "./components/AlbumsList";
 import { useDispatch, useSelector } from "react-redux";
+
+import { fetchAlbums } from "./actions/spotifyActions";
+import AlbumsList from "./components/AlbumsList";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -32,7 +33,7 @@ function App() {
         .then(function (data) {
           // Log the data to the console
           // You would do something with both sets of data here
-          dispatch({ type: "FETCH_ALBUMS", albums: data[0].items });
+          dispatch(fetchAlbums(data[0].items));
         })
         .catch(function (error) {
           // if there's an error, log it
@@ -49,7 +50,7 @@ function App() {
       {!accessToken && (
         <Button onClick={handleSignInClick}>Sign in with Spotify</Button>
       )}
-      <AlbumsList />}
+      <AlbumsList />
     </Container>
   );
 }
