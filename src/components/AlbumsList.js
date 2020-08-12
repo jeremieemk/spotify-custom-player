@@ -1,17 +1,20 @@
 import React from "react";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
 
 function AlbumsList(props) {
-  console.log(props);
+  const userAlbums = useSelector((state) => state.albums);
+  console.log(userAlbums);
   return (
     <Container>
-      {props.albums.map((a) => (
-        <AlbumCover
-          key={a.album.id}
-          src={a.album.images[0].url}
-          alt={a.album.name}
-        />
-      ))}
+      {userAlbums &&
+        userAlbums.map((a) => (
+          <AlbumCover
+            key={a.album.id}
+            src={a.album.images[0].url}
+            alt={a.album.name}
+          />
+        ))}
     </Container>
   );
 }

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
-import "./App.css";
 
 import queryString from "query-string";
 import styled from "styled-components";
 
 import AlbumsList from "./components/AlbumsList";
+import { useDispatch, useSelector } from "react-redux";
 
 function App() {
-  const [spotifyData, setData] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
     setAccessToken(parsed.access_token);
@@ -34,7 +32,7 @@ function App() {
         .then(function (data) {
           // Log the data to the console
           // You would do something with both sets of data here
-          setData({ albums: data[0].items });
+          dispatch({ type: "FETCH_ALBUMS", albums: data[0].items });
         })
         .catch(function (error) {
           // if there's an error, log it
@@ -51,7 +49,7 @@ function App() {
       {!accessToken && (
         <Button onClick={handleSignInClick}>Sign in with Spotify</Button>
       )}
-      {spotifyData && <AlbumsList albums={spotifyData.albums} />}
+      <AlbumsList />}
     </Container>
   );
 }
