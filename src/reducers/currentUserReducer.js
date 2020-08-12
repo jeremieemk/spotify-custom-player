@@ -1,8 +1,8 @@
 export const initialState = {
-  albums: null,
+  token: null,
 };
 
-export function spotifyReducer(state = initialState, action) {
+export function currentUserReducer(state = initialState, action) {
   switch (action.type) {
     case "FETCH_ALBUMS":
       console.log(state, action.albums);

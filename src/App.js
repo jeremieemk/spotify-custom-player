@@ -17,8 +17,16 @@ function App() {
 
   useEffect(() => {
     if (accessToken) {
+      fetchData();
+    }
+  }, [accessToken]);
+
+  function fetchData() {
+    let apiUrl = "https://api.spotify.com/v1/me/albums?&limit=50";
+    let albums = [];
+    function apiCall(url, albums) {
       Promise.all([
-        fetch("https://api.spotify.com/v1/me/albums?limit=50", {
+        fetch(url, {
           headers: { Authorization: "Bearer " + accessToken },
         }),
       ])
@@ -31,16 +39,23 @@ function App() {
           );
         })
         .then(function (data) {
-          // Log the data to the console
-          // You would do something with both sets of data here
-          dispatch(fetchAlbums(data[0].items));
+          console.log("data", data);
+          albums.push(...data[0].items);
+          console.log("albums", albums);
+          console.log("next", data[0].next);
+          if (data[0].next) {
+            apiCall(data[0].next, albums);
+          } else {
+            dispatch(fetchAlbums(albums));
+          }
         })
         .catch(function (error) {
           // if there's an error, log it
           console.log(error);
         });
     }
-  }, [accessToken]);
+    apiCall(apiUrl, albums);
+  }
 
   function handleSignInClick() {
     window.location = "http://localhost:8888/login";
