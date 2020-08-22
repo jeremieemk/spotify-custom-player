@@ -1,6 +1,6 @@
-export function fetchAlbums(albums) {
+export function getCurrentTrack(currentTrack) {
   return {
-    type: "FETCH_ALBUMS",
-    albums: albums,
+    type: "FETCH_CURRENT_TRACK",
+    currentTrack: currentTrack,
   };
 }

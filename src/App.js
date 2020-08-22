@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import queryString from "query-string";
 import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { fetchAlbums } from "./actions/spotifyActions";
-import AlbumsList from "./components/AlbumsList";
+import { getCurrentTrack } from "./actions/spotifyActions";
+import NowPlaying from "./components/NowPlaying";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -22,39 +22,48 @@ function App() {
   }, [accessToken]);
 
   function fetchData() {
-    let apiUrl = "https://api.spotify.com/v1/me/albums?&limit=50";
-    let albums = [];
-    function apiCall(url, albums) {
-      Promise.all([
-        fetch(url, {
-          headers: { Authorization: "Bearer " + accessToken },
-        }),
-      ])
-        .then(function (responses) {
-          // Get a JSON object from each of the responses
-          return Promise.all(
-            responses.map(function (response) {
-              return response.json();
-            })
-          );
-        })
-        .then(function (data) {
-          console.log("data", data);
-          albums.push(...data[0].items);
-          console.log("albums", albums);
-          console.log("next", data[0].next);
-          if (data[0].next) {
-            apiCall(data[0].next, albums);
-          } else {
-            dispatch(fetchAlbums(albums));
-          }
-        })
-        .catch(function (error) {
-          // if there's an error, log it
-          console.log(error);
-        });
-    }
-    apiCall(apiUrl, albums);
+    let apiUrl = "https://api.spotify.com/v1/me/player";
+    fetch(apiUrl, {
+      headers: { Authorization: "Bearer " + accessToken },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        dispatch(getCurrentTrack(data.item));
+      })
+      .catch(function (error) {
+        // if there's an error, log it
+        console.log(error);
+      });
+    // function apiCall(url, albums) {
+    //   Promise.all([
+    //     fetch(url, {
+    //       headers: { Authorization: "Bearer " + accessToken },
+    //     }),
+    //   ])
+    //     .then(function (responses) {
+    //       // Get a JSON object from each of the responses
+    //       return Promise.all(
+    //         responses.map(function (response) {
+    //           return response.json();
+    //         })
+    //       );
+    //     })
+    //     .then(function (data) {
+    //       albums.push(...data[0].items);
+    //       if (data[0].next) {
+    //         apiCall(data[0].next, albums);
+    //       } else {
+    //         dispatch(fetchAlbums(albums));
+    //       }
+    //     })
+    //     .catch(function (error) {
+    //       // if there's an error, log it
+    //       console.log(error);
+    //     });
+    // }
+    // apiCall(apiUrl, albums);
   }
 
   function handleSignInClick() {
@@ -65,7 +74,11 @@ function App() {
       {!accessToken && (
         <Button onClick={handleSignInClick}>Sign in with Spotify</Button>
       )}
-      <AlbumsList />
+      {accessToken && (
+        <div>
+          <NowPlaying />
+        </div>
+      )}
     </Container>
   );
 }

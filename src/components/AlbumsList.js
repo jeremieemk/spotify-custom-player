@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
+import Player from "./Player";
 
 function AlbumsList(props) {
   const userAlbums = shuffle(useSelector((state) => state.albums));
@@ -14,13 +15,10 @@ function AlbumsList(props) {
     }
   }
 
-  console.log(
-    "test",
-    useSelector((state) => state)
-  );
   return (
     <Container>
       <>
+        <Player />
         {!userAlbums && <h1>Loading...</h1>}
         {userAlbums &&
           userAlbums.map((a) => (
@@ -36,8 +34,11 @@ function AlbumsList(props) {
 }
 const Container = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
   width: 100%;
+  height: 100%;
 `;
 
 const AlbumCover = styled.img`

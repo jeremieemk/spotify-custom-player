@@ -3,10 +3,10 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { createStore } from "redux";
-import { spotifyDataReducer } from "./reducers/spotifyDataReducer";
+import { currentTrackReducer } from "./reducers/spotifyDataReducer";
 import { Provider } from "react-redux";
 
-const store = createStore(spotifyDataReducer);
+const store = createStore(currentTrackReducer);
 
 ReactDOM.render(
   <React.StrictMode>
