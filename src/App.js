@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import queryString from "query-string";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
+import Discojs from "discojs";
 
 import { getCurrentTrack } from "./actions/spotifyActions";
 import NowPlaying from "./components/NowPlaying";
@@ -15,10 +16,44 @@ function App() {
     setAccessToken(parsed.access_token);
   }, [window.location]);
 
+  const client = new Discojs({
+    userToken: "qICsaNYfZQFfkMlwfWDNOlCpmBXgdcWBgvsKjJhV",
+  });
+
   useEffect(() => {
     if (accessToken) {
       fetchData();
     }
+    client
+      .searchDatabase({
+        artist: "The Comet Is Coming",
+        query: "Birth Of Creation",
+        type: "master",
+      })
+      .then((data) => {
+        console.log("discogs", data);
+      })
+      .catch((error) => {
+        console.warn("Oops, something went wrong!", error);
+      });
+
+    client
+      .getMaster(1517360)
+      .then((data) => {
+        console.log("release", data);
+      })
+      .catch((error) => {
+        console.warn("Oops, something went wrong!", error);
+      });
+
+    client
+      .getArtist(4764481)
+      .then((data) => {
+        console.log("artist", data);
+      })
+      .catch((error) => {
+        console.warn("Oops, something went wrong!", error);
+      });
   }, [accessToken]);
 
   function fetchData() {
@@ -36,34 +71,6 @@ function App() {
         // if there's an error, log it
         console.log(error);
       });
-    // function apiCall(url, albums) {
-    //   Promise.all([
-    //     fetch(url, {
-    //       headers: { Authorization: "Bearer " + accessToken },
-    //     }),
-    //   ])
-    //     .then(function (responses) {
-    //       // Get a JSON object from each of the responses
-    //       return Promise.all(
-    //         responses.map(function (response) {
-    //           return response.json();
-    //         })
-    //       );
-    //     })
-    //     .then(function (data) {
-    //       albums.push(...data[0].items);
-    //       if (data[0].next) {
-    //         apiCall(data[0].next, albums);
-    //       } else {
-    //         dispatch(fetchAlbums(albums));
-    //       }
-    //     })
-    //     .catch(function (error) {
-    //       // if there's an error, log it
-    //       console.log(error);
-    //     });
-    // }
-    // apiCall(apiUrl, albums);
   }
 
   function handleSignInClick() {
