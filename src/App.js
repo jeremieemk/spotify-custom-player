@@ -59,10 +59,10 @@ function App() {
   //   }, [currentTrack]);
 
   function getCurrentTrack() {
-    let spotifyTrackData = {};
-    let spotifyAlbumData = {};
-    let discogsAlbumData = {};
-    let discogsArtistData = {};
+    let spotifyTrackData = null;
+    let spotifyAlbumData = null;
+    let discogsAlbumData = null;
+    let discogsArtistData = null;
     let discogsAlbumId = null;
     let discogsArtistId = null;
     const nowPlayingApiUrl = "https://api.spotify.com/v1/me/player";
@@ -91,40 +91,63 @@ function App() {
           })
       )
       .then(() => {
+        const regex = /\s*\([^)]*\)/g;
         dicogsApi
           .searchDatabase({
             artist: spotifyTrackData.artists[0].name,
-            query: spotifyTrackData.name,
-            type: "master",
+            query: spotifyTrackData.name.replace(regex, ""),
+            type: "release",
           })
           .then((data) => {
             console.log("discogs", data);
-            discogsAlbumId = data.results[0].id;
+            // checks if discogs search brings any result
+            if (data.results.length > 0) {
+              // gets the oldest release of the list of results
+              const filteredList = data.results.filter((release) =>
+                release.hasOwnProperty("year")
+              );
+              if (filteredList.length === 0) {
+                discogsAlbumId = data.results[0].id;
+              } else {
+                const orderedList = filteredList.sort(
+                  (a, b) => parseInt(a.year) - parseInt(b.year)
+                );
+                discogsAlbumId = orderedList[0].id;
+              }
+            } else {
+              setSongData({
+                spotifyTrackData: spotifyTrackData,
+                spotifyAlbumData: spotifyAlbumData,
+                discogsAlbumData: discogsAlbumData,
+                discogsArtistData: discogsArtistData,
+              });
+            }
             return discogsAlbumId;
           })
           .then((discogsAlbumId) => {
-            console.log("id", discogsAlbumId);
-            dicogsApi
-              .getMaster(discogsAlbumId)
-              .then((data) => {
-                discogsAlbumData = data;
-                discogsArtistId = data.artists[0].id;
-                console.log("discogs album", data);
-                return discogsArtistId;
-              })
-              .then((discogsArtistId) => {
-                console.log(discogsArtistId);
-                dicogsApi.getArtist(discogsArtistId).then((data) => {
-                  discogsArtistData = data;
-                  console.log("discogs artist", data);
-                  setSongData({
-                    spotifyTrackData: spotifyTrackData,
-                    spotifyAlbumData: spotifyAlbumData,
-                    discogsAlbumData: discogsAlbumData,
-                    discogsArtistData: discogsArtistData,
-                  });
+            discogsAlbumId &&
+              dicogsApi
+                .getRelease(discogsAlbumId)
+                .then((data) => {
+                  discogsAlbumData = data;
+
+                  discogsArtistId = data.artists[0].id;
+                  console.log("discogs album", data);
+                  return discogsArtistId;
+                })
+                .then((discogsArtistId) => {
+                  discogsArtistId &&
+                    dicogsApi.getArtist(discogsArtistId).then((data) => {
+                      discogsArtistData = data;
+                      console.log("discogs artist", data);
+                      setSongData({
+                        spotifyTrackData: spotifyTrackData,
+                        spotifyAlbumData: spotifyAlbumData,
+                        discogsAlbumData: discogsAlbumData,
+                        discogsArtistData: discogsArtistData,
+                      });
+                    });
                 });
-              });
           });
       })
       .catch(function (error) {
@@ -140,7 +163,7 @@ function App() {
       {!accessToken && (
         <Button onClick={handleSignInClick}>Sign in with Spotify</Button>
       )}
-      {accessToken && (
+      {accessToken && songData && (
         <div>
           <NowPlaying songData={songData} />
         </div>
