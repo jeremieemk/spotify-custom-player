@@ -127,13 +127,10 @@ function App() {
               });
           });
       })
-
       .catch(function (error) {
         console.log(error);
       });
   }
-
-  console.log(songData);
 
   function handleSignInClick() {
     window.location = "http://localhost:8888/login";
@@ -145,10 +142,7 @@ function App() {
       )}
       {accessToken && (
         <div>
-          {/* <NowPlaying
-            spotifyApiAlbumData={spotifyApiAlbumData}
-            currentTrack={currentTrack}
-          /> */}
+          <NowPlaying songData={songData} />
         </div>
       )}
     </Container>
