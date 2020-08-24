@@ -2,76 +2,138 @@ import React, { useEffect, useState } from "react";
 
 import queryString from "query-string";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
 import Discojs from "discojs";
 
-import { getCurrentTrack } from "./actions/spotifyActions";
 import NowPlaying from "./components/NowPlaying";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
-  const dispatch = useDispatch();
+  const [songData, setSongData] = useState(null);
+
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
     setAccessToken(parsed.access_token);
   }, [window.location]);
 
-  const client = new Discojs({
+  const dicogsApi = new Discojs({
     userToken: "qICsaNYfZQFfkMlwfWDNOlCpmBXgdcWBgvsKjJhV",
   });
 
   useEffect(() => {
     if (accessToken) {
-      fetchData();
+      getCurrentTrack();
     }
-    client
-      .searchDatabase({
-        artist: "The Comet Is Coming",
-        query: "Birth Of Creation",
-        type: "master",
-      })
-      .then((data) => {
-        console.log("discogs", data);
-      })
-      .catch((error) => {
-        console.warn("Oops, something went wrong!", error);
-      });
-
-    client
-      .getMaster(1517360)
-      .then((data) => {
-        console.log("release", data);
-      })
-      .catch((error) => {
-        console.warn("Oops, something went wrong!", error);
-      });
-
-    client
-      .getArtist(4764481)
-      .then((data) => {
-        console.log("artist", data);
-      })
-      .catch((error) => {
-        console.warn("Oops, something went wrong!", error);
-      });
   }, [accessToken]);
 
-  function fetchData() {
-    let apiUrl = "https://api.spotify.com/v1/me/player";
-    fetch(apiUrl, {
+  //   useEffect(() => {
+  //     if (currentTrack) {
+  //       const currentAlbumApiUrl =
+  //         "https://api.spotify.com/v1/albums/" + currentTrack.album.id;
+  //       fetch(currentAlbumApiUrl, {
+  //         headers: { Authorization: "Bearer " + accessToken },
+  //       })
+  //         .then((response) => {
+  //           return response.json();
+  //         })
+  //         .then((data) => {
+  //           setSpotifyApiAlbumData(data);
+  //         })
+  //         .catch(function (error) {
+  //           console.log(error);
+  //         });
+  //       console.log("finished");
+  //       dicogsApi
+  //         .searchDatabase({
+  //           query: "The Comet Is Coming",
+
+  //           type: "artist",
+  //         })
+  //         .then((data) => {
+  //           console.log("discogs", data);
+  //           setSpotifyApiAlbumData({ ...songData, discogsApiArtistData: data });
+  //         })
+  //         .catch((error) => {
+  //           console.warn("Oops, something went wrong!", error);
+  //         });
+  //     }
+  //   }, [currentTrack]);
+
+  function getCurrentTrack() {
+    let spotifyTrackData = {};
+    let spotifyAlbumData = {};
+    let discogsAlbumData = {};
+    let discogsArtistData = {};
+    let discogsAlbumId = null;
+    let discogsArtistId = null;
+    const nowPlayingApiUrl = "https://api.spotify.com/v1/me/player";
+    fetch(nowPlayingApiUrl, {
       headers: { Authorization: "Bearer " + accessToken },
     })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        dispatch(getCurrentTrack(data.item));
+        console.log(data);
+        spotifyTrackData = data.item;
+        const currentAlbumApiUrl =
+          "https://api.spotify.com/v1/albums/" + spotifyTrackData.album.id;
+        return currentAlbumApiUrl;
       })
+      .then((currentAlbumApiUrl) =>
+        fetch(currentAlbumApiUrl, {
+          headers: { Authorization: "Bearer " + accessToken },
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            spotifyAlbumData = data;
+          })
+      )
+      .then(() => {
+        dicogsApi
+          .searchDatabase({
+            artist: spotifyTrackData.artists[0].name,
+            query: spotifyTrackData.name,
+            type: "master",
+          })
+          .then((data) => {
+            console.log("discogs", data);
+            discogsAlbumId = data.results[0].id;
+            return discogsAlbumId;
+          })
+          .then((discogsAlbumId) => {
+            console.log("id", discogsAlbumId);
+            dicogsApi
+              .getMaster(discogsAlbumId)
+              .then((data) => {
+                discogsAlbumData = data;
+                discogsArtistId = data.artists[0].id;
+                console.log("discogs album", data);
+                return discogsArtistId;
+              })
+              .then((discogsArtistId) => {
+                console.log(discogsArtistId);
+                dicogsApi.getArtist(discogsArtistId).then((data) => {
+                  discogsArtistData = data;
+                  console.log("discogs artist", data);
+                  setSongData({
+                    spotifyTrackData: spotifyTrackData,
+                    spotifyAlbumData: spotifyAlbumData,
+                    discogsAlbumData: discogsAlbumData,
+                    discogsArtistData: discogsArtistData,
+                  });
+                });
+              });
+          });
+      })
+
       .catch(function (error) {
-        // if there's an error, log it
         console.log(error);
       });
   }
+
+  console.log(songData);
 
   function handleSignInClick() {
     window.location = "http://localhost:8888/login";
@@ -83,7 +145,10 @@ function App() {
       )}
       {accessToken && (
         <div>
-          <NowPlaying />
+          {/* <NowPlaying
+            spotifyApiAlbumData={spotifyApiAlbumData}
+            currentTrack={currentTrack}
+          /> */}
         </div>
       )}
     </Container>
