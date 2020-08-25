@@ -33,6 +33,14 @@ export default function NowPlaying(props) {
     ? ""
     : "the " + props.songData.spotifyAlbumData.album_type;
 
+  const tracklistItem =
+    props.songData.discogsAlbumData &&
+    props.songData.discogsAlbumData.tracklist.find(
+      (track) => track.title === props.songData.spotifyTrackData.name
+    );
+
+  const trackCredits = tracklistItem && tracklistItem.extraartists;
+
   return (
     <Container>
       <img src={albumCover} alt="" />
@@ -58,6 +66,42 @@ export default function NowPlaying(props) {
         {props.songData.discogsArtistData &&
           props.songData.discogsArtistData.profile}
       </p>
+      {trackCredits && (
+        <>
+          <h2>Track Credits</h2>
+          <ul>
+            {trackCredits.map((artist) => {
+              return (
+                <div>
+                  <strong>
+                    {artist.role}
+                    {": "}
+                  </strong>
+                  <span>{artist.name}</span>
+                </div>
+              );
+            })}
+          </ul>
+        </>
+      )}
+      {props.songData.discogsAlbumData.extraartists && (
+        <>
+          <h2>Record Credits</h2>
+          <ul>
+            {props.songData.discogsAlbumData.extraartists.map((artist) => {
+              return (
+                <div>
+                  <strong>
+                    {artist.role}
+                    {": "}
+                  </strong>
+                  <span>{artist.name}</span>
+                </div>
+              );
+            })}
+          </ul>
+        </>
+      )}
     </Container>
   );
 }
