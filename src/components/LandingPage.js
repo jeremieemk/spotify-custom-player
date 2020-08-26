@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import AlbumCover from "../img/dirty.jpg";
+import { Button } from "../globalStyles.js";
 
 export default function LandingPage(props) {
   return (
@@ -47,19 +48,4 @@ const Container = styled.div`
     font-size: 0.8rem;
     width: 15rem;
   }
-`;
-
-const Button = styled.div`
-  background-color: rgb(229, 255, 240);
-  border-radius: 12px;
-  padding: 22.5px 40.5px;
-  color: rgb(34, 34, 34);
-
-  cursor: pointer;
-  &:hover {
-    background-color: rgb(245, 245, 245);
-    box-shadow: rgb(34, 34, 34) 2px 2px 0px 0px;
-  }
-  font-family: medium;
-  border: 2px solid black;
 `;

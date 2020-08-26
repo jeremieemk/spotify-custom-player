@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import queryString from "query-string";
-import styled from "styled-components";
+
 import { fetchCurrentTrack, fetchSongInfo } from "./utilities/fetchData";
 
 import NowPlaying from "./components/NowPlaying";
@@ -20,7 +20,7 @@ function App() {
     setAccessToken(parsed.access_token);
   }, [window.location]);
 
-  // gets current track info every 5 seconds
+  // fetches current track info every 5 seconds
   useEffect(() => {
     if (accessToken) {
       fetchCurrentTrack(accessToken, setCurrentTrack);
@@ -30,9 +30,10 @@ function App() {
     }
   }, [accessToken]);
 
-  // gets current track info every 5 seconds
+  // fetches song details when track changes
   useEffect(() => {
-    currentTrackName &&
+    if (currentTrackName) {
+      setSongData(null);
       fetchSongInfo(
         accessToken,
         currentTrack,
@@ -40,12 +41,15 @@ function App() {
         setSongData,
         releaseIndex
       );
+    }
+  }, [currentTrackName, releaseIndex]);
+
+  useEffect(() => {
+    setReleaseIndex(0);
   }, [currentTrackName]);
 
-  console.log(songData);
-
   function skipReleaseIndex() {
-    releaseIndex < songData.releasesCount
+    releaseIndex < songData.releasesCount - 1
       ? setReleaseIndex(releaseIndex + 1)
       : setReleaseIndex(0);
   }
@@ -56,14 +60,17 @@ function App() {
   return (
     <div className="App">
       {!accessToken && <LandingPage handleSignInClick={handleSignInClick} />}
-      {songData && (
+      {songData ? (
         <div>
           <NowPlaying
             currentTrack={currentTrack}
             skipReleaseIndex={skipReleaseIndex}
+            releaseIndex={releaseIndex}
             songData={songData}
           />
         </div>
+      ) : (
+        <div>Loading</div>
       )}
     </div>
   );

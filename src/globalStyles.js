@@ -1,11 +1,13 @@
 import { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
+
 import bentonsansregular from "./fonts/bentonsansregular.otf";
 import bentonsansblack from "./fonts/bentonsansblack.otf";
 import bentonsansbook from "./fonts/bentonsansbook.otf";
 import bentonsansmedium from "./fonts/bentonsansmedium.otf";
 import bentonsansbold from "./fonts/bentonsansbold.otf";
 
-const GlobalStyle = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle`
  @font-face {
     font-family: regular;
     src: local('bentonsansregular'),  url(${bentonsansregular});
@@ -30,7 +32,21 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     font-family: regular;
+    box-sizing: border-box
   }
 `;
 
-export default GlobalStyle;
+export const Button = styled.div`
+  background-color: rgb(229, 255, 240);
+  border-radius: 12px;
+  padding: 22.5px 40.5px;
+  color: rgb(34, 34, 34);
+
+  cursor: pointer;
+  &:hover {
+    background-color: rgb(245, 245, 245);
+    box-shadow: rgb(34, 34, 34) 2px 2px 0px 0px;
+  }
+  font-family: medium;
+  border: 2px solid black;
+`;
