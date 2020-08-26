@@ -2,157 +2,52 @@ import React, { useEffect, useState } from "react";
 
 import queryString from "query-string";
 import styled from "styled-components";
-import Discojs from "discojs";
 
+import AlbumCover from "./img/dirty.jpg";
 import NowPlaying from "./components/NowPlaying";
+import { fetchCurrentTrack, fetchSongInfo } from "./utilities/fetchData";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
   const [songData, setSongData] = useState(null);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [releaseIndex, setReleaseIndex] = useState(0);
 
+  const currentTrackName = currentTrack && currentTrack.name;
+  // extracts token from url
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
     setAccessToken(parsed.access_token);
   }, [window.location]);
 
-  const dicogsApi = new Discojs({
-    userToken: "qICsaNYfZQFfkMlwfWDNOlCpmBXgdcWBgvsKjJhV",
-  });
-
+  // gets current track info every 5 seconds
   useEffect(() => {
     if (accessToken) {
-      getCurrentTrack();
+      fetchCurrentTrack(accessToken, setCurrentTrack);
+      setInterval(() => {
+        fetchCurrentTrack(accessToken, setCurrentTrack);
+      }, 5000);
     }
   }, [accessToken]);
 
-  //   useEffect(() => {
-  //     if (currentTrack) {
-  //       const currentAlbumApiUrl =
-  //         "https://api.spotify.com/v1/albums/" + currentTrack.album.id;
-  //       fetch(currentAlbumApiUrl, {
-  //         headers: { Authorization: "Bearer " + accessToken },
-  //       })
-  //         .then((response) => {
-  //           return response.json();
-  //         })
-  //         .then((data) => {
-  //           setSpotifyApiAlbumData(data);
-  //         })
-  //         .catch(function (error) {
-  //           console.log(error);
-  //         });
-  //       console.log("finished");
-  //       dicogsApi
-  //         .searchDatabase({
-  //           query: "The Comet Is Coming",
+  // gets current track info every 5 seconds
+  useEffect(() => {
+    currentTrackName &&
+      fetchSongInfo(
+        accessToken,
+        currentTrack,
+        songData,
+        setSongData,
+        releaseIndex
+      );
+  }, [currentTrackName]);
 
-  //           type: "artist",
-  //         })
-  //         .then((data) => {
-  //           console.log("discogs", data);
-  //           setSpotifyApiAlbumData({ ...songData, discogsApiArtistData: data });
-  //         })
-  //         .catch((error) => {
-  //           console.warn("Oops, something went wrong!", error);
-  //         });
-  //     }
-  //   }, [currentTrack]);
+  console.log(songData);
 
-  function getCurrentTrack() {
-    let spotifyTrackData = null;
-    let spotifyAlbumData = null;
-    let discogsAlbumData = null;
-    let discogsArtistData = null;
-    let discogsAlbumId = null;
-    let discogsArtistId = null;
-    const nowPlayingApiUrl = "https://api.spotify.com/v1/me/player";
-    fetch(nowPlayingApiUrl, {
-      headers: { Authorization: "Bearer " + accessToken },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        spotifyTrackData = data.item;
-        const currentAlbumApiUrl =
-          "https://api.spotify.com/v1/albums/" + spotifyTrackData.album.id;
-        return currentAlbumApiUrl;
-      })
-      .then((currentAlbumApiUrl) =>
-        fetch(currentAlbumApiUrl, {
-          headers: { Authorization: "Bearer " + accessToken },
-        })
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            spotifyAlbumData = data;
-          })
-      )
-      .then(() => {
-        const regex = /\s*\([^)]*\)/g;
-        dicogsApi
-          .searchDatabase({
-            artist: spotifyTrackData.artists[0].name,
-            query: spotifyTrackData.name.replace(regex, ""),
-            type: "release",
-          })
-          .then((data) => {
-            console.log("discogs", data);
-            // checks if discogs search brings any result
-            if (data.results.length > 0) {
-              // gets the oldest release of the list of results
-              const filteredList = data.results.filter((release) =>
-                release.hasOwnProperty("year")
-              );
-              if (filteredList.length === 0) {
-                discogsAlbumId = data.results[0].id;
-              } else {
-                const orderedList = filteredList.sort(
-                  (a, b) => parseInt(a.year) - parseInt(b.year)
-                );
-                discogsAlbumId = orderedList[0].id;
-              }
-            } else {
-              setSongData({
-                spotifyTrackData: spotifyTrackData,
-                spotifyAlbumData: spotifyAlbumData,
-                discogsAlbumData: discogsAlbumData,
-                discogsArtistData: discogsArtistData,
-              });
-            }
-            return discogsAlbumId;
-          })
-          .then((discogsAlbumId) => {
-            discogsAlbumId &&
-              dicogsApi
-                .getRelease(discogsAlbumId)
-                .then((data) => {
-                  discogsAlbumData = data;
-
-                  discogsArtistId = data.artists[0].id;
-                  console.log("discogs album", data);
-                  return discogsArtistId;
-                })
-                .then((discogsArtistId) => {
-                  discogsArtistId &&
-                    dicogsApi.getArtist(discogsArtistId).then((data) => {
-                      discogsArtistData = data;
-                      console.log("discogs artist", data);
-                      setSongData({
-                        spotifyTrackData: spotifyTrackData,
-                        spotifyAlbumData: spotifyAlbumData,
-                        discogsAlbumData: discogsAlbumData,
-                        discogsArtistData: discogsArtistData,
-                      });
-                    });
-                });
-          });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  function skipReleaseIndex() {
+    releaseIndex < songData.releasesCount
+      ? setReleaseIndex(releaseIndex + 1)
+      : setReleaseIndex(0);
   }
 
   function handleSignInClick() {
@@ -161,11 +56,28 @@ function App() {
   return (
     <Container className="App">
       {!accessToken && (
-        <Button onClick={handleSignInClick}>Sign in with Spotify</Button>
+        <>
+          <h1>
+            <strong>NowPlaying</strong> brings you detailed information
+            (credits, dates, cover art) about the songs you are currently
+            streaming on Spotify.
+          </h1>
+          <img src={AlbumCover} alt="album-cover" />
+
+          <Button onClick={handleSignInClick}>Log in to Spotify!</Button>
+          <h2>
+            (To use <strong>NowPlaying</strong>, you need to be currently
+            playing music on your spotify app)
+          </h2>
+        </>
       )}
-      {accessToken && songData && (
+      {songData && (
         <div>
-          <NowPlaying songData={songData} />
+          <NowPlaying
+            currentTrack={currentTrack}
+            skipReleaseIndex={skipReleaseIndex}
+            songData={songData}
+          />
         </div>
       )}
     </Container>
@@ -176,23 +88,43 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100vh;
+  justify-content: center;
+  width: 100%;
+  img {
+    height: 15rem;
+    padding: 1rem;
+  }
+  h1 {
+    font-family: bold;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    text-align: center;
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+  strong {
+    color: #e47de9;
+  }
+  h2 {
+    font-size: 0.8rem;
+    width: 15rem;
+  }
 `;
 
 const Button = styled.div`
-  background-color: rgb(29, 185, 84);
-  color: rgb(255, 255, 255);
-  font-family: Circular, Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  line-height: 12px;
-  padding: 11px 32px;
-  border-radius: 20px;
+  background-color: rgb(229, 255, 240);
+  border-radius: 12px;
+  padding: 22.5px 40.5px;
+  color: rgb(34, 34, 34);
+
   cursor: pointer;
-  margin: 2rem 0;
   &:hover {
-    opacity: 0.8;
+    background-color: rgb(245, 245, 245);
+    box-shadow: rgb(34, 34, 34) 2px 2px 0px 0px;
   }
+  font-family: medium;
+  border: 2px solid black;
 `;
 
 export default App;

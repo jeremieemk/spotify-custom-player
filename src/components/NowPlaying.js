@@ -5,15 +5,15 @@ export default function NowPlaying(props) {
   console.log("props", props);
   function addComa(i) {
     return (
-      props.songData.spotifyTrackData.artists.length > 1 &&
-      i < props.songData.spotifyTrackData.artists.length - 1
+      props.currentTrack.artists.length > 1 &&
+      i < props.currentTrack.artists.length - 1
     );
   }
 
   const releaseDate =
     props.songData.discogsAlbumData && props.songData.discogsAlbumData.year
       ? props.songData.discogsAlbumData.year
-      : props.songData.spotifyTrackData.album.release_date.substring(0, 4);
+      : props.currentTrack.album.release_date.substring(0, 4);
 
   const label =
     props.songData.discogsAlbumData && props.songData.discogsAlbumData.labels
@@ -25,9 +25,10 @@ export default function NowPlaying(props) {
       ? props.songData.discogsAlbumData.title
       : props.songData.spotifyAlbumData.name;
 
-  const albumCover = props.songData.discogsAlbumData
-    ? props.songData.discogsAlbumData.images[0].uri
-    : props.songData.spotifyTrackData.album.images[0].url;
+  const albumCover =
+    props.songData.discogsAlbumData && props.songData.discogsAlbumData.images
+      ? props.songData.discogsAlbumData.images[0].uri
+      : props.currentTrack.album.images[0].url;
 
   const albumType = props.songData.discogsAlbumData
     ? ""
@@ -36,32 +37,32 @@ export default function NowPlaying(props) {
   const tracklistItem =
     props.songData.discogsAlbumData &&
     props.songData.discogsAlbumData.tracklist.find(
-      (track) => track.title === props.songData.spotifyTrackData.name
+      (track) => track.title === props.currentTrack.name
     );
 
   const trackCredits = tracklistItem && tracklistItem.extraartists;
 
   return (
     <Container>
+      <button onClick={props.skipReleaseIndex}> More infos</button>
       <img src={albumCover} alt="" />
       <h1>
-        {props.songData.spotifyTrackData.artists.map((artist, i) => (
+        {props.currentTrack.artists.map((artist, i) => (
           <span>
             {artist.name}
             {addComa(i) && `, `}
           </span>
         ))}
       </h1>
-      <h2>"{props.songData.spotifyTrackData.name}"</h2>
+      <h2>"{props.currentTrack.name}"</h2>
       <h2>
-        from {albumType} "{album}"
-      </h2>
-      <h2>
+        from {albumType} "{album}" {" - "}
         {label} {"("}
         {releaseDate}
         {")"}
       </h2>
-      <h2>About {props.songData.spotifyTrackData.artists[0].name}</h2>
+
+      <h2>About {props.currentTrack.artists[0].name}</h2>
       <p>
         {props.songData.discogsArtistData &&
           props.songData.discogsArtistData.profile}
@@ -84,24 +85,43 @@ export default function NowPlaying(props) {
           </ul>
         </>
       )}
-      {props.songData.discogsAlbumData.extraartists && (
+      {props.songData.discogsAlbumData && (
         <>
-          <h2>Record Credits</h2>
+          <h2>Record Tracklist</h2>
           <ul>
-            {props.songData.discogsAlbumData.extraartists.map((artist) => {
+            {props.songData.discogsAlbumData.tracklist.map((track) => {
               return (
                 <div>
                   <strong>
-                    {artist.role}
-                    {": "}
+                    {track.position}
+                    {" - "}
                   </strong>
-                  <span>{artist.name}</span>
+                  <span>{track.title}</span>
                 </div>
               );
             })}
           </ul>
         </>
       )}
+      {props.songData.discogsAlbumData &&
+        props.songData.discogsAlbumData.extraartists && (
+          <>
+            <h2>Record Credits</h2>
+            <ul>
+              {props.songData.discogsAlbumData.extraartists.map((artist) => {
+                return (
+                  <div>
+                    <strong>
+                      {artist.role}
+                      {": "}
+                    </strong>
+                    <span>{artist.name}</span>
+                  </div>
+                );
+              })}
+            </ul>
+          </>
+        )}
     </Container>
   );
 }
