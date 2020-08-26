@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Button } from "../globalStyles.js";
+import { ArrowRightIcon } from "react-line-awesome";
 
 export default function NowPlaying(props) {
   console.log("props", props);
@@ -59,7 +60,7 @@ export default function NowPlaying(props) {
         </h1>
         <h2 className="song-title">"{props.currentTrack.name}"</h2>
         <h2 className="record-label">
-          from {albumType} "{album}" {" - "}
+          <ArrowRightIcon /> from {albumType} "{album}" {" - "}
           {label} {"("}
           {releaseDate}
           {")"}
