@@ -56,7 +56,10 @@ function App() {
   }
 
   function handleSignInClick() {
-    window.location = process.env.REACT_APP_BACKEND_URI;
+    window.location =
+      process.env.NODE_ENV === "production"
+        ? "https://spotify-labels-backend.herokuapp.com/login"
+        : "http://localhost:8888/login";
   }
   return (
     <div className="App">
