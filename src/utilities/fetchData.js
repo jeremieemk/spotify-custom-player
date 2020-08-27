@@ -25,9 +25,9 @@ export function fetchSongInfo(
   releaseIndex
 ) {
   const dicogsApi = new Discojs({
-    userToken: "qICsaNYfZQFfkMlwfWDNOlCpmBXgdcWBgvsKjJhV",
+    userToken: process.env.REACT_APP_DISCOGS_KEY,
   });
-  console.log("gros fetch");
+  console.log("gros fetch", process.env.DISCOGS_KEY);
   let spotifyAlbumData = null;
   let discogsAlbumData = null;
   let discogsArtistData = null;
@@ -46,15 +46,15 @@ export function fetchSongInfo(
       spotifyAlbumData = data;
     })
     .then(() => {
+      // removes parenthesis and what's inside
       const regex = /\s*\([^)]*\)/g;
+
       dicogsApi
         .searchDatabase({
           // search uses only the first word of the artist name
           // artist: spotifyTrackData.artists[0].name.replace(/ .*/, ""),
           artist: currentTrack.artists[0].name,
-          track: currentTrack.name,
-          // removes parenthesis and what's inside
-          // .replace(regex, "")
+          track: currentTrack.name.replace(regex, ""),
           // .substring(0, currentTrack.name.indexOf("-")),
           type: "release",
         })

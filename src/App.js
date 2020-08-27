@@ -6,6 +6,7 @@ import { fetchCurrentTrack, fetchSongInfo } from "./utilities/fetchData";
 
 import NowPlaying from "./components/NowPlaying";
 import LandingPage from "./components/LandingPage";
+import Loader from "./components/Loader";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -55,7 +56,7 @@ function App() {
   }
 
   function handleSignInClick() {
-    window.location = "http://localhost:8888/login";
+    window.location = process.env.REACT_APP_BACKEND_URI;
   }
   return (
     <div className="App">
@@ -70,7 +71,11 @@ function App() {
           />
         </div>
       )}
-      {accessToken && !songData && <div>Loading</div>}
+      {accessToken && !songData && (
+        <div>
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }

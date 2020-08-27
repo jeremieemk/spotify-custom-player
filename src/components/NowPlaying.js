@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Button } from "../globalStyles.js";
+import { Button, Heading } from "../globalStyles.js";
 import { ArrowRightIcon } from "react-line-awesome";
 import ReactMarkdown from "react-markdown";
 
@@ -51,14 +51,14 @@ export default function NowPlaying(props) {
         <img src={albumCover} alt="" />
       </div>
       <div className="infos-container">
-        <h1>
+        <Heading>
           {props.currentTrack.artists.map((artist, i) => (
             <span>
               {artist.name}
               {addComa(i) && `, `}
             </span>
           ))}
-        </h1>
+        </Heading>
         <h2 className="song-title">"{props.currentTrack.name}"</h2>
         <h2 className="record-label">
           <ArrowRightIcon /> from {albumType} "{album}" {" - "}
@@ -90,7 +90,10 @@ export default function NowPlaying(props) {
         {props.songData.discogsArtistData && (
           <>
             <h2>About {props.currentTrack.artists[0].name}</h2>
-            <ReactMarkdown source={props.songData.discogsArtistData.profile} />
+            <ReactMarkdown
+              source={props.songData.discogsArtistData.profile.replace}
+              disallowedTypes={["link"]}
+            />
           </>
         )}
         {trackCredits && (
@@ -161,14 +164,7 @@ const Container = styled.div`
   .infos-container {
     padding: 2rem;
   }
-  h1 {
-    background-color: rgb(250, 199, 255);
-    padding: 5px 10px;
-    width: fit-content;
-    font-family: medium;
-    font-size: 2.3rem;
-    letter-spacing: 4px;
-  }
+
   .song-title {
     font-size: 2rem;
   }
