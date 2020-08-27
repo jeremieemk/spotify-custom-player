@@ -19,8 +19,8 @@ function App() {
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
     console.log("parsed", parsed);
-    setAccessToken(parsed.access_token);
-    console.log("parsed.access_token", parsed.access_token);
+    setAccessToken(parsed.code);
+    console.log("parsed.access_token", parsed.code);
   }, [window.location]);
 
   console.log("token", accessToken);
