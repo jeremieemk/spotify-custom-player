@@ -47,7 +47,10 @@ const Container = styled.div`
     text-align: center;
     margin-block-start: 0;
     margin-block-end: 0;
-    width: 25rem;
+    width: 60%;
+    @media (max-width: 801px) {
+      width: 80%;
+    }
   }
   strong {
     color: #e47de9;

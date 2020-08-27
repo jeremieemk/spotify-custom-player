@@ -21,6 +21,8 @@ function App() {
     setAccessToken(parsed.access_token);
   }, [window.location]);
 
+  console.log("token", accessToken);
+
   // fetches current track info every 5 seconds
   useEffect(() => {
     if (accessToken) {

@@ -159,17 +159,19 @@ export default function NowPlaying(props) {
 const Container = styled.div`
   display: flex;
   height: 100%;
-
+  @media (max-width: 801px) {
+    flex-direction: column;
+  }
   .image-container,
   .infos-container {
     padding: 2rem;
+    width: 50%;
+    @media (max-width: 801px) {
+      width: 100%;
+    }
   }
-
   .song-title {
     font-size: 2rem;
-  }
-  div {
-    width: 50%;
   }
   img {
     width: 100%;
