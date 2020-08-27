@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import AlbumCover from "../img/dirty.jpg";
 import { Button } from "../globalStyles.js";
+import { ArrowRightIcon } from "react-line-awesome";
 
 export default function LandingPage(props) {
   return (
@@ -12,12 +13,18 @@ export default function LandingPage(props) {
         Spotify.
       </h1>
       <img src={AlbumCover} alt="album-cover" />
+      <h2>
+        <span>
+          <ArrowRightIcon /> How does it work?
+        </span>
+        <br />
+        1. Play some music from your Spotify player (you'll need a Spotify
+        premium account to use this app)
+        <br />
+        2. Log in to your Spotify account via the button below:
+      </h2>
 
       <Button onClick={props.handleSignInClick}>Log in to Spotify!</Button>
-      <h2>
-        (To use <strong>NowPlaying</strong>, you need to be currently playing
-        music on your spotify app)
-      </h2>
     </Container>
   );
 }
@@ -31,7 +38,7 @@ const Container = styled.div`
   width: 100%;
   img {
     height: 15rem;
-    padding: 1rem;
+    padding: 3rem 0 0;
   }
   h1 {
     font-family: bold;
@@ -40,12 +47,21 @@ const Container = styled.div`
     text-align: center;
     margin-block-start: 0;
     margin-block-end: 0;
+    width: 25rem;
   }
   strong {
     color: #e47de9;
   }
   h2 {
+    span {
+      font-family: medium;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+    margin: 2rem 0;
     font-size: 0.8rem;
     width: 15rem;
+    line-height: 1.55;
+    font-family: book;
   }
 `;

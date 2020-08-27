@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Button } from "../globalStyles.js";
 import { ArrowRightIcon } from "react-line-awesome";
+import ReactMarkdown from "react-markdown";
 
 export default function NowPlaying(props) {
   console.log("props", props);
@@ -89,7 +90,7 @@ export default function NowPlaying(props) {
         {props.songData.discogsArtistData && (
           <>
             <h2>About {props.currentTrack.artists[0].name}</h2>
-            <p>{props.songData.discogsArtistData.profile}</p>
+            <ReactMarkdown source={props.songData.discogsArtistData.profile} />
           </>
         )}
         {trackCredits && (
