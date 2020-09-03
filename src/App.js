@@ -7,30 +7,28 @@ import { fetchCurrentTrack, fetchSongInfo } from "./utilities/fetchData";
 import NowPlaying from "./components/NowPlaying";
 import LandingPage from "./components/LandingPage";
 import Loader from "./components/Loader";
+import Error from "./components/Error";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
   const [songData, setSongData] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [releaseIndex, setReleaseIndex] = useState(0);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const currentTrackName = currentTrack && currentTrack.name;
   // extracts token from url
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
-    console.log("parsed", parsed);
-    setAccessToken(parsed.code);
-    console.log("parsed.access_token", parsed.code);
+    setAccessToken(parsed.access_token);
   }, [window.location]);
-
-  console.log("token", accessToken);
 
   // fetches current track info every 5 seconds
   useEffect(() => {
     if (accessToken) {
-      fetchCurrentTrack(accessToken, setCurrentTrack);
+      fetchCurrentTrack(accessToken, setCurrentTrack, setShowErrorMessage);
       setInterval(() => {
-        fetchCurrentTrack(accessToken, setCurrentTrack);
+        fetchCurrentTrack(accessToken, setCurrentTrack, setShowErrorMessage);
       }, 5000);
     }
   }, [accessToken]);
@@ -78,11 +76,12 @@ function App() {
           />
         </div>
       )}
-      {accessToken && !songData && (
+      {accessToken && !songData && !showErrorMessage && (
         <div>
           <Loader />
         </div>
       )}
+      {accessToken && showErrorMessage && <Error />}
     </div>
   );
 }

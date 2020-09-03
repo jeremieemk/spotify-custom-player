@@ -1,15 +1,25 @@
 import Discojs from "discojs";
 
-export function fetchCurrentTrack(accessToken, setCurrentTrack) {
+export function fetchCurrentTrack(
+  accessToken,
+  setCurrentTrack,
+  setShowErrorMessage
+) {
   const nowPlayingApiUrl = "https://api.spotify.com/v1/me/player";
   fetch(nowPlayingApiUrl, {
     headers: { Authorization: "Bearer " + accessToken },
   })
     .then((response) => {
-      console.log(response);
-      return response.json();
+      console.log(response.status);
+      if (response.status === 204) {
+        setShowErrorMessage(true);
+      } else {
+        setShowErrorMessage(false);
+        return response.json();
+      }
     })
     .then((data) => {
+      console.log(data);
       setCurrentTrack(data.item);
     })
     .catch(function (error) {
