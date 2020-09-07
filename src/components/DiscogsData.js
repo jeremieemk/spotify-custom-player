@@ -39,10 +39,7 @@ export default function DiscogsData(props) {
       return (
         <>
           <h2>About {currentTrack.artists[0].name}</h2>
-          <ReactMarkdown
-            source={songData.discogsArtistData.profile}
-            disallowedTypes={["link"]}
-          />
+          <ReactMarkdown source={songData.discogsArtistData.profile} />
         </>
       );
     }
