@@ -3,7 +3,7 @@ import Discojs from "discojs";
 export function fetchCurrentTrack(
   accessToken,
   setCurrentTrack,
-  setShowErrorMessage
+  setErrorMessage
 ) {
   const nowPlayingApiUrl = "https://api.spotify.com/v1/me/player";
   fetch(nowPlayingApiUrl, {
@@ -11,10 +11,10 @@ export function fetchCurrentTrack(
   })
     .then((response) => {
       console.log(response.status);
-      if (response.status === 204) {
-        setShowErrorMessage(true);
+      if (response.status === 204 || response.status === 401) {
+        setErrorMessage(response.status);
       } else {
-        setShowErrorMessage(false);
+        setErrorMessage(null);
         return response.json();
       }
     })

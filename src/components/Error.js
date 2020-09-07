@@ -3,14 +3,32 @@ import styled from "styled-components";
 import { Heading } from "../globalStyles.js";
 
 export default function Error(props) {
-  return (
-    <Container>
-      <Heading className="error-message">
-        Oops... it looks like you are not currently streaming any music from
-        Spotify. Play a song on Spotify to launch this app.
-      </Heading>
-    </Container>
-  );
+  let message = "";
+  const redirectUrl =
+    process.env.NODE_ENV === "production"
+      ? "https://spotify-labels-backend.herokuapp.com/login"
+      : "http://localhost:8888/login";
+
+  switch (props.errorMessage) {
+    case 204:
+      message = (
+        <Heading className="error-message">
+          Oops... it looks like you are not currently streaming any music from
+          Spotify. Play a song on Spotify to launch this app.
+        </Heading>
+      );
+      break;
+    case 401:
+      message = (
+        <Heading className="error-message">
+          Oops... it looks like you have been disconnected from Spotify. Click{" "}
+          <a href={redirectUrl}>here</a> to reconnect.
+        </Heading>
+      );
+    default:
+      break;
+  }
+  return <Container>{message}</Container>;
 }
 
 const Container = styled.div`

@@ -14,7 +14,7 @@ function App() {
   const [songData, setSongData] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [releaseIndex, setReleaseIndex] = useState(0);
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const currentTrackName = currentTrack && currentTrack.name;
   // extracts token from url
@@ -26,9 +26,9 @@ function App() {
   // fetches current track info every 5 seconds
   useEffect(() => {
     if (accessToken) {
-      fetchCurrentTrack(accessToken, setCurrentTrack, setShowErrorMessage);
+      fetchCurrentTrack(accessToken, setCurrentTrack, setErrorMessage);
       setInterval(() => {
-        fetchCurrentTrack(accessToken, setCurrentTrack, setShowErrorMessage);
+        fetchCurrentTrack(accessToken, setCurrentTrack, setErrorMessage);
       }, 5000);
     }
   }, [accessToken]);
@@ -76,12 +76,12 @@ function App() {
           />
         </div>
       )}
-      {accessToken && !songData && !showErrorMessage && (
+      {accessToken && !songData && !errorMessage && (
         <div>
           <Loader />
         </div>
       )}
-      {accessToken && showErrorMessage && <Error />}
+      {accessToken && errorMessage && <Error errorMessage={errorMessage} />}
     </div>
   );
 }
