@@ -36,6 +36,9 @@ const Container = styled.div`
   height: 100vh;
   justify-content: center;
   width: 100%;
+  @media (max-width: 801px) {
+    height: auto;
+  }
   img {
     height: 15rem;
     padding: 3rem 0 0;
@@ -50,6 +53,7 @@ const Container = styled.div`
     width: 60%;
     @media (max-width: 801px) {
       width: 80%;
+      margin-top: 3rem;
     }
   }
   strong {
@@ -66,5 +70,8 @@ const Container = styled.div`
     width: 15rem;
     line-height: 1.55;
     font-family: book;
+    @media (max-width: 801px) {
+      margin-bottom: 3rem;
+    }
   }
 `;
