@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { Button } from "../globalStyles.js";
-import ReactMarkdown from "react-markdown";
 
 export default function DiscogsData(props) {
   const { currentTrack, songData, releaseIndex, skipReleaseIndex } = props;
@@ -23,7 +22,7 @@ export default function DiscogsData(props) {
       return (
         <Button className="more-releases" onClick={skipReleaseIndex}>
           {" "}
-          More Releases
+          More releases of this track
           <span>
             ({releaseIndex + 1}
             {"/"}
@@ -35,11 +34,19 @@ export default function DiscogsData(props) {
   }
 
   function renderArtistDetails() {
-    if (songData.discogsArtistData) {
+    if (
+      songData.discogsArtistData &&
+      songData.discogsArtistData.profile != ""
+    ) {
+      const bio = songData.discogsArtistData.profile
+        .replaceAll("[l=", "")
+        .replaceAll("]", "")
+        .replaceAll("[m=", "")
+        .replaceAll("[a=", "");
       return (
         <>
           <h2>About {currentTrack.artists[0].name}</h2>
-          <ReactMarkdown source={songData.discogsArtistData.profile} />
+          {bio}
         </>
       );
     }

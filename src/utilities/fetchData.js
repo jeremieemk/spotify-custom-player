@@ -64,8 +64,10 @@ export function fetchSongInfo(
           // search uses only the first word of the artist name
           // artist: spotifyTrackData.artists[0].name.replace(/ .*/, ""),
           artist: currentTrack.artists[0].name,
-          track: currentTrack.name.replace(regex, ""),
-          // .substring(0, currentTrack.name.indexOf("-")),
+          track: currentTrack.name
+            .replace(regex, "")
+            .replaceAll("&", "")
+            .substring(0, currentTrack.name.indexOf("-")),
           type: "release",
         })
         .then((data) => {
@@ -75,7 +77,6 @@ export function fetchSongInfo(
             const filteredList = data.results.filter((release) =>
               release.hasOwnProperty("year")
             );
-            console.log("filteredList", filteredList);
             releasesCount = filteredList.length;
             if (filteredList.length === 0) {
               discogsAlbumId = data.results[0].id;

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Heading } from "../globalStyles.js";
-import { ArrowRightIcon } from "react-line-awesome";
+import { ArrowRightIcon, BroadcastTowerIcon } from "react-line-awesome";
 import DiscogsData from "./DiscogsData";
 
 export default function NowPlaying(props) {
@@ -46,7 +46,8 @@ export default function NowPlaying(props) {
         : songData.spotifyAlbumData.label;
     return (
       <div>
-        <ArrowRightIcon /> from {albumType} "{album}" {" - "}
+        <ArrowRightIcon />
+        from {albumType} "{album}" {" - "}
         {label} {"("}
         {releaseDate}
         {")"}
@@ -63,13 +64,18 @@ export default function NowPlaying(props) {
         <Heading>{renderArtists()}</Heading>
         <h2 className="song-title">"{currentTrack.name}"</h2>
         <h2 className="record-label">{renderReleaseDetails()}</h2>
-        {songData.discogsAlbumData && (
+        {songData.discogsAlbumData ? (
           <DiscogsData
             currentTrack={currentTrack}
             skipReleaseIndex={skipReleaseIndex}
             releaseIndex={releaseIndex}
             songData={songData}
           />
+        ) : (
+          <h4>
+            <BroadcastTowerIcon /> Sorry! we couldn't find more information on
+            this track...
+          </h4>
         )}
       </div>
     </Container>
