@@ -39,7 +39,6 @@ function fetchSpotifyAlbumData(currentTrack,
     })
     .then((data) => {
       spotifyAlbumData = data;
-      console.log("in the function", spotifyAlbumData);
       resolve(spotifyAlbumData)
     })
     .catch(function (error) {
@@ -64,16 +63,24 @@ function searchDiscogsDatabase(
   return new Promise((resolve, reject) => {
   // removes parenthesis and what's inside
   const regex = /\s*\([^)]*\)/g;
-  console.log("track name", currentTrack.name.replace(regex, "").replaceAll("&", "").substring(currentTrack.name.indexOf("-"), currentTrack.name.length))
+
+  const cleanTrackName = currentTrack.name.includes("-") ?
+      currentTrack.name
+            .replace(regex, "")
+            .replaceAll("&", "")
+            .substring(0, currentTrack.name.indexOf("-")):
+      currentTrack.name
+            .replace(regex, "")
+            .replaceAll("&", "")
+
+  console.log(cleanTrackName) 
+
   dicogsApi
     .searchDatabase({
       // search uses only the first word of the artist name
       // artist: spotifyTrackData.artists[0].name.replace(/ .*/, ""),
       artist: currentTrack.artists[0].name,
-      track: currentTrack.name
-        .replace(regex, "")
-        .replaceAll("&", "")
-        .substring(0, currentTrack.name.indexOf("-")),
+      track: cleanTrackName,
       type: "release",
     })
     .then((data) => {
@@ -131,7 +138,6 @@ export function fetchSongInfo(
 
   fetchSpotifyAlbumData(currentTrack, spotifyAlbumData, accessToken)
     .then((spotifyAlbumData) => {
-      console.log("spotifyAlbumData", spotifyAlbumData)
       searchDiscogsDatabase(
         dicogsApi,
         currentTrack,
@@ -145,22 +151,18 @@ export function fetchSongInfo(
         discogsAlbumData,
         spotifyAlbumData
       ).then((discogsAlbumId) => {
-        console.log(discogsAlbumId)
         discogsAlbumId &&
           dicogsApi
             .getRelease(discogsAlbumId)
             .then((data) => {
               discogsAlbumData = data;
-
               discogsArtistId = data.artists[0].id;
-              console.log("discogs album", data);
               return discogsArtistId;
             })
             .then((discogsArtistId) => {
               discogsArtistId &&
                 dicogsApi.getArtist(discogsArtistId).then((data) => {
                   discogsArtistData = data;
-                  console.log("discogs artist", data);
                   setSongData({
                     ...songData,
                     spotifyAlbumData: spotifyAlbumData,

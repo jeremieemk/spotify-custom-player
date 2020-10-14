@@ -5,8 +5,6 @@ import { ArrowRightIcon, BroadcastTowerIcon } from "react-line-awesome";
 import DiscogsData from "./DiscogsData";
 
 export default function NowPlaying(props) {
-  console.log("props", props);
-
   const { currentTrack, songData, releaseIndex, skipReleaseIndex } = props;
   const albumCover =
     songData.discogsAlbumData && songData.discogsAlbumData.images
