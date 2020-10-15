@@ -59,6 +59,7 @@ function searchDiscogsDatabase(
   discogsArtistData,
   spotifyAlbumData,
   discogsAlbumData,
+  discogsReleaseData,
 ) {
   return new Promise((resolve, reject) => {
   // removes parenthesis and what's inside
@@ -73,17 +74,20 @@ function searchDiscogsDatabase(
             .replace(regex, "")
             .replaceAll("&", "")
 
-  console.log(cleanTrackName) 
+  const cleanArtistName = currentTrack.artists[0].name.replaceAll("&", "and")
+
+  console.log(cleanArtistName, cleanTrackName) 
 
   dicogsApi
     .searchDatabase({
       // search uses only the first word of the artist name
       // artist: spotifyTrackData.artists[0].name.replace(/ .*/, ""),
-      artist: currentTrack.artists[0].name,
+      artist: cleanArtistName,
       track: cleanTrackName,
       type: "release",
     })
     .then((data) => {
+      console.log("discogs api data", data)
       // checks if discogs search brings any result
       if (data.results.length > 0) {
         // gets the oldest release of the list of results
@@ -93,16 +97,15 @@ function searchDiscogsDatabase(
         
         releasesCount = filteredList.length;
         if (filteredList.length === 0) {
-          discogsAlbumId = data.results[0].id;
-         
+          discogsReleaseData = data.results[0];
         } else {
           const orderedList = filteredList.sort(
             (a, b) => parseInt(a.year) - parseInt(b.year)
           );
-          discogsAlbumId = orderedList[releaseIndex].id;
-          
+          discogsReleaseData = orderedList[releaseIndex];
         }
-        resolve(discogsAlbumId)
+        const result = [discogsReleaseData, releasesCount]
+        resolve(result)
       } else {
         setSongData({
           ...songData,
@@ -134,6 +137,7 @@ export function fetchSongInfo(
   let discogsArtistData = null;
   let discogsAlbumId = null;
   let discogsArtistId = null;
+  let discogsReleaseData = null
   let releasesCount = 0
 
   fetchSpotifyAlbumData(currentTrack, spotifyAlbumData, accessToken)
@@ -150,7 +154,10 @@ export function fetchSongInfo(
         spotifyAlbumData,
         discogsAlbumData,
         spotifyAlbumData
-      ).then((discogsAlbumId) => {
+      ).then((response) => {
+        discogsReleaseData = response[0]
+        discogsAlbumId = response[0].id
+        releasesCount = response[1]
         discogsAlbumId &&
           dicogsApi
             .getRelease(discogsAlbumId)
@@ -169,6 +176,7 @@ export function fetchSongInfo(
                     discogsAlbumData: discogsAlbumData,
                     discogsArtistData: discogsArtistData,
                     releasesCount: releasesCount,
+                    discogsReleaseData: discogsReleaseData
                   });
                 });
             });
