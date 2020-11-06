@@ -21,23 +21,23 @@ function App() {
   useEffect(() => {
     const token = window.location.hash.substr(1).split('&')[0].split("=")[1]
     if (token) {
-      // window.opener.spotifyCallback(token)
-      // popup.close()
       setAccessToken(token)
     }
   }, []); 
 
   function handleSignInClick() {
-    const client_id = "d9bf26c841ce4b99b3a3671fd01b90cf"
-    const redirect_uri = "http://localhost:3000"
+    
+    const client_id = process.env.REACT_APP_SPOTIFY_KEY
+    const redirect_uri = process.env.NODE_ENV === "production"
+        ? "https://spotify-now-playing-discogs.netlify.app"
+        : "http://localhost:3000" ;
     const scope = "streaming user-read-email user-read-private user-library-read user-read-playback-state user-modify-playback-state"
     window.location = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&redirect_uri=${redirect_uri}&scope=${scope}&show_dialog=true`
-      
-    // window.location =
-    //   process.env.NODE_ENV === "production"
-    //     ? "https://spotify-labels-backend.herokuapp.com/login"
-    //     : "http://localhost:8888/login";
   }
+
+console.log(process.env.REACT_APP_SPOTIFY_KEY)
+console.log(process.env.REACT_APP_DISCOGS_KEY)
+
 
   return (
     <div className="App">
